@@ -48,15 +48,16 @@ public class UserMealsUtil {
 
         Map<LocalDate, Integer> dateTimeMapWithCalories = meals.stream()
                 .collect(Collectors.toMap(k -> k.getDateTime().toLocalDate(), UserMeal::getCalories, Integer::sum));
-        
+
         List<UserMealWithExcess> userMealWithExcessList = new ArrayList<>();
         meals.stream()
-                .filter(userMeal -> TimeUtil.isBetweenHalfOpen(userMeal.getDateTime().toLocalTime(), startTime,endTime))
-                .forEach(userMeal -> userMealWithExcessList.add
+                .filter(userMeal -> TimeUtil.isBetweenHalfOpen(userMeal.getDateTime().toLocalTime(), startTime, endTime))
+                .map(userMeal -> userMealWithExcessList.add
                 (new UserMealWithExcess(userMeal.getDateTime(),
                         userMeal.getDescription(),
                         userMeal.getCalories(),
-                        dateTimeMapWithCalories.get(userMeal.getDateTime().toLocalDate()) > caloriesPerDay)));
+                        dateTimeMapWithCalories.get(userMeal.getDateTime().toLocalDate()) > caloriesPerDay)))
+                .collect(Collectors.toList());
 
         return userMealWithExcessList;
     }
