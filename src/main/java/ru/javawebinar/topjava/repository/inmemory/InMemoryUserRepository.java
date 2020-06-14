@@ -4,6 +4,7 @@ import javafx.collections.transformation.SortedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import ru.javawebinar.topjava.model.AbstractNamedEntity;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 import ru.javawebinar.topjava.web.SecurityUtil;
@@ -43,9 +44,8 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public List<User> getAll() {
         log.info("getAll");
-        return userList.entrySet().stream()
-                .map(Map.Entry::getValue)
-                .sorted(Comparator.comparing(u -> u.getName(), Comparator.reverseOrder()))
+        return userList.values().stream()
+                .sorted(Comparator.comparing(AbstractNamedEntity::getName, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
     }
 
@@ -53,9 +53,8 @@ public class InMemoryUserRepository implements UserRepository {
     public User getByEmail(String email) {
         log.info("getByEmail {}", email);
         if (email == null) return null;
-        List<User> userListWithEmail = userList.entrySet().stream()
-                .filter(userList -> userList.getValue().getEmail().equalsIgnoreCase(email))
-                .map(user -> user.getValue())
+        List<User> userListWithEmail = userList.values().stream()
+                .filter(user -> user.getEmail().equalsIgnoreCase(email))
                 .collect(Collectors.toList());
         return userListWithEmail.size() > 0 ? userListWithEmail.get(0) : null;
 
