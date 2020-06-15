@@ -6,30 +6,29 @@ import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryMealRepository implements MealRepository {
     private final Map<Integer, Meal> repository = new ConcurrentHashMap<>();
-    private final AtomicInteger counter = new AtomicInteger(0);
 
     {
         for (Meal meal : MealsUtil.MEALS) {
-            save(meal, 1);
+            saveMeal(meal, 1);
         }
     }
 
     @Override
-    public Meal save(Meal meal, int userId) {
-        if (meal.isNew()) {
-            meal.setId(counter.incrementAndGet());
-            repository.put(meal.getId(), meal);
-            return meal;
-        }
-        else if (meal.getUserId() == userId) {
-            return repository.computeIfPresent(meal.getId(), (id, oldMeal) -> meal);
-        }
+    public Meal saveMeal(Meal meal, int userId) {
+        //meal.setId(userId);
+        repository.put(meal.getId(), meal);
+        return meal;
+    }
+
+    @Override
+    public Meal updateMeal(Meal meal, int userId) {
+        Meal upateMeal = repository.get(meal.getId());
+
         return null;
     }
 
@@ -50,22 +49,20 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     @Override
-    public Collection<Meal> getAll(int userId) {
-        if (userId >= 1) {
-            return sortMealOfDate(repository);
-        }
-        else {
-            return sortMealOfDate(repository).stream()
-                    .filter(mealId -> mealId.getUserId() == userId)
-                    .collect(Collectors.toList());
-        }
-
+    public List<Meal> getAll(int userId) {
+        List<Meal> userListFilterByUserId = filterByUserId(repository, userId);
+        return sortMealOfDate(userListFilterByUserId);
     }
 
-    public static List<Meal> sortMealOfDate(Map<Integer, Meal> repository) {
-        return repository.entrySet().stream()
-                .sorted(Comparator.comparing(m -> m.getValue().getDateTime(), Comparator.reverseOrder()))
-                .map(Map.Entry::getValue)
+    public List<Meal> filterByUserId(Map<Integer, Meal> repository, Integer userId) {
+        return repository.values().stream()
+            .filter(mealId -> mealId.getUserId() == userId)
+            .collect(Collectors.toList());
+    }
+
+    public List<Meal> sortMealOfDate(List< Meal> repository) {
+        return repository.stream()
+                .sorted(Comparator.comparing(Meal::getDateTime, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
     }
 }

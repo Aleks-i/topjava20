@@ -21,13 +21,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
 
-    private final MealRestController controller;
-
-    public MealServlet(MealRestController controller) {
-        this.controller = controller;
-    }
-
-
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
@@ -35,46 +28,54 @@ public class MealServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
-        String id = request.getParameter("id");
+        try (ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml")) {
+            MealRestController controller = appCtx.getBean(MealRestController.class);
 
-        Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
-                LocalDateTime.parse(request.getParameter("dateTime")),
-                request.getParameter("description"),
-                Integer.parseInt(request.getParameter("calories")),
-                SecurityUtil.authUserId());
+            request.setCharacterEncoding("UTF-8");
+            String id = request.getParameter("id");
 
-        log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
-        controller.save(meal);
-        response.sendRedirect("meals");
+            Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
+                    LocalDateTime.parse(request.getParameter("dateTime")),
+                    request.getParameter("description"),
+                    Integer.parseInt(request.getParameter("calories")),
+                    SecurityUtil.authUserId());
+
+            log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
+            controller.create_update(meal);
+            response.sendRedirect("meals");
+        }
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
+        try(ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml")) {
+            MealRestController controller = appCtx.getBean(MealRestController.class);
 
-        switch (action == null ? "all" : action) {
-            case "delete":
-                int id = getId(request);
-                log.info("Delete {}", id);
-                controller.delete(id);
-                response.sendRedirect("meals");
-                break;
-            case "create":
-            case "update":
-                final Meal meal = "create".equals(action) ?
-                        new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000, SecurityUtil.authUserId()) :
-                        controller.get(getId(request));
-                request.setAttribute("meal", meal);
-                request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
-                break;
-            case "all":
-            default:
-                log.info("getAll");
-                request.setAttribute("meals",
-                        MealsUtil.getTos(controller.getAll(), MealsUtil.DEFAULT_CALORIES_PER_DAY));
-                request.getRequestDispatcher("/meals.jsp").forward(request, response);
-                break;
+            String action = request.getParameter("action");
+
+            switch (action == null ? "all" : action) {
+                case "delete":
+                    int id = getId(request);
+                    log.info("Delete {}", id);
+                    controller.delete(id);
+                    response.sendRedirect("meals");
+                    break;
+                case "create":
+                case "update":
+                    final Meal meal = "create".equals(action) ?
+                            new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000, SecurityUtil.authUserId()) :
+                            controller.get(getId(request));
+                    request.setAttribute("meal", meal);
+                    request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
+                    break;
+                case "all":
+                default:
+                    log.info("getAll");
+                    request.setAttribute("meals",
+                            MealsUtil.getTos(controller.getAll(), MealsUtil.DEFAULT_CALORIES_PER_DAY));
+                    request.getRequestDispatcher("/meals.jsp").forward(request, response);
+                    break;
+            }
         }
     }
 

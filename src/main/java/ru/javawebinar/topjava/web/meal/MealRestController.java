@@ -9,17 +9,23 @@ import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.web.SecurityUtil;
 import java.util.Collection;
 
+import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
+
 
 @Controller
 public class MealRestController {
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger log = LoggerFactory.getLogger(MealRestController.class);
 
     @Autowired
     private MealService service;
 
-    public Meal save(Meal meal) {
+    public Meal create_update(Meal meal) {
         log.info("delete {}", meal);
-        return service.save(meal, SecurityUtil.authUserId());
+        checkNew(meal);
+        if (meal.isNew()) {
+            return service.createMeal(meal, SecurityUtil.authUserId());
+        }
+        return service.update(meal, SecurityUtil.authUserId());
     }
 
     public void delete(int id) {

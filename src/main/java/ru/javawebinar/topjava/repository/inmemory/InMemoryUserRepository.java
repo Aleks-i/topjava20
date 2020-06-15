@@ -18,32 +18,32 @@ public class InMemoryUserRepository implements UserRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryUserRepository.class);
     private final AtomicInteger counter = new AtomicInteger(0);
 
-    private final Map<Integer, User> userList = new ConcurrentHashMap<>();
+    private final Map<Integer, User> usersDB = new ConcurrentHashMap<>();
 
     @Override
     public boolean delete(int id) {
         log.info("delete {}", id);
         counter.decrementAndGet();
-        return userList.remove(id) != null;
+        return usersDB.remove(id) != null;
     }
 
     @Override
     public User save(User user) {
         log.info("save {}", user);
-        userList.put(counter.incrementAndGet(), user);
+        usersDB.put(counter.incrementAndGet(), user);
         return user;
     }
 
     @Override
     public User get(int id) {
         log.info("get {}", id);
-        return userList.get(id);
+        return usersDB.get(id);
     }
 
     @Override
     public List<User> getAll() {
         log.info("getAll");
-        return userList.values().stream()
+        return usersDB.values().stream()
                 .sorted(Comparator.comparing(AbstractNamedEntity::getName, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
     }
@@ -52,11 +52,9 @@ public class InMemoryUserRepository implements UserRepository {
     public User getByEmail(String email) {
         log.info("getByEmail {}", email);
         if (email == null) return null;
-        List<User> userListWithEmail = userList.values().stream()
+        List<User> userListWithEmail = usersDB.values().stream()
                 .filter(user -> user.getEmail().equalsIgnoreCase(email))
                 .collect(Collectors.toList());
         return userListWithEmail.size() > 0 ? userListWithEmail.get(0) : null;
-
     }
-
 }

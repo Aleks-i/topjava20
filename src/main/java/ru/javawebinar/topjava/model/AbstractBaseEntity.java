@@ -1,14 +1,13 @@
 package ru.javawebinar.topjava.model;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public abstract class AbstractBaseEntity {
     protected Integer id;
+    protected final AtomicInteger counter = new AtomicInteger(0);
 
-    protected AbstractBaseEntity(Integer id) {
-        this.id = id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
+    protected AbstractBaseEntity() {
+        this.id = counter.incrementAndGet();
     }
 
     public Integer getId() {

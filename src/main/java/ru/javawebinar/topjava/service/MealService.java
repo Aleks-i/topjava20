@@ -15,8 +15,12 @@ public class MealService {
         this.repository = repository;
     }
 
-    public Meal save(Meal meal, int authUserId) {
-        return ValidationUtil.checkNotFoundWithId(repository.save(meal, authUserId), authUserId);
+    public Meal createMeal(Meal meal, int authUserId) {
+        return repository.saveMeal(meal, authUserId);
+    }
+
+    public Meal update(Meal meal, int authUserId) {
+        return ValidationUtil.checkNotFoundWithId(repository.updateMeal(meal, authUserId), authUserId);
     }
 
     public void delete(int id, int authUserId) {
@@ -30,4 +34,5 @@ public class MealService {
     public Collection<Meal> getAll(int userId) {
         return repository.getAll(userId);
     }
+
 }
