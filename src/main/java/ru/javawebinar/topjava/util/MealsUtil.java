@@ -50,4 +50,19 @@ public class MealsUtil {
     private static MealTo createTo(Meal meal, boolean excess) {
         return new MealTo(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
     }
+
+    public static List<MealTo> getAllMealToByFilterTimeDate(List<MealTo> mealTos, LocalDate dateStart, LocalDate dateEnd,
+                                                     LocalTime timeStart, LocalTime timeEnd) {
+ /*       dateStart = dateStart == null ? LocalDate.MIN : dateStart;
+        dateEnd = dateEnd == null ? LocalDate.MAX : dateEnd;
+        timeStart = timeStart == null ? LocalTime.MIN : timeStart;
+        timeStart = timeEnd == null ? LocalTime.MAX : timeEnd;*/
+
+        return mealTos.stream()
+                .filter(mealTo -> mealTo.getDateTime().toLocalDate().isAfter(dateStart) &&
+                        mealTo.getDateTime().toLocalDate().isBefore(dateEnd))
+                .filter(mealTo -> mealTo.getDateTime().toLocalTime().isAfter(timeStart) &&
+                        mealTo.getDateTime().toLocalTime().isAfter(timeEnd))
+                .collect(Collectors.toList());
+    }
 }

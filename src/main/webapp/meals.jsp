@@ -35,14 +35,15 @@
 
         <form method="post" action="${pageContext.request.contextPath}/meals">
             <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td><input type="date" name="dateStart" required></td>
+                <td><input type="date" name="dateEnd" required></td>
+                <td><input type="time" name="timeStart" required></td>
+                <td><input type="time" name="timeEnd" required></td>
             </tr>
+            <button type="submit">Filter</button>
         </form>
     </table>
-<p></p>
+    <p></p>
     <a href="meals?action=create">Add Meal</a>
     <br><br>
     <table border="1" cellpadding="8" cellspacing="0">

@@ -3,7 +3,6 @@ package ru.javawebinar.topjava.web;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -22,7 +21,6 @@ public class MealServlet extends HttpServlet {
     ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml");
     MealRestController controller = appCtx.getBean(MealRestController.class);
 
-
         @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
@@ -30,56 +28,52 @@ public class MealServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-            request.setCharacterEncoding("UTF-8");
-            String id = request.getParameter("id");
-
-            Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
+        request.setCharacterEncoding("UTF-8");
+        String id = request.getParameter("id");
+        Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
                     LocalDateTime.parse(request.getParameter("dateTime")),
                     request.getParameter("description"),
                     Integer.parseInt(request.getParameter("calories")));
-            log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
+        log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
         if (meal.isNew()) {
             controller.create(meal);
         } else {
             controller.update(meal, Integer.parseInt(id));
         }
         response.sendRedirect("meals");
-        }
-
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-            String action = request.getParameter("action");
-
-            switch (action == null ? "all" : action) {
-                case "delete":
-                    int id = getId(request);
-                    log.info("Delete {}", id);
-                    controller.delete(id);
-                    response.sendRedirect("meals");
-                    break;
-                case "create":
-                    final Meal meal = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
- //                           controller.get(getId(request));
-                    request.setAttribute("meal", meal);
-                    request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
-                    break;
-                case "update":
-                    int idForUpdate = getId(request);
-                    request.setAttribute("meal", controller.get(idForUpdate));
-                    request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
-                    break;
-                case "all":
-                default:
-                    log.info("getAll");
-                    request.setAttribute("meals",
-                                controller.getAllMealTo());
-                    request.getRequestDispatcher("/meals.jsp").forward(request, response);
-                    break;
-            }
+        String action = request.getParameter("action");
+        switch (action == null ? "all" : action) {
+            case "delete":
+                int id = getId(request);
+                log.info("Delete {}", id);
+                controller.delete(id);
+                response.sendRedirect("meals");
+                break;
+            case "create":
+                final Meal meal = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
+                request.setAttribute("meal", meal);
+                request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
+                break;
+            case "update":
+                int idForUpdate = getId(request);
+                request.setAttribute("meal", controller.get(idForUpdate));
+                request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
+                break;
+            case "filter":
+                //LocalDate = request.getParameter("dateTime");
+            case "all":
+            default:
+                log.info("getAll");
+                request.setAttribute("meals",
+                            controller.getAllMealTo());
+                request.getRequestDispatcher("/meals.jsp").forward(request, response);
+                break;
         }
+    }
 
     private int getId(HttpServletRequest request) {
         String paramId = Objects.requireNonNull(request.getParameter("id"));
