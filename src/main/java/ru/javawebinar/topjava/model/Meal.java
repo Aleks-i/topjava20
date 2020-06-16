@@ -3,27 +3,27 @@ package ru.javawebinar.topjava.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Meal extends AbstractBaseEntity {
 
-    private final LocalDateTime dateTime;
+    protected LocalDateTime dateTime;
 
-    private final String description;
+    protected String description;
 
-    private final int calories;
+    protected Integer calories;
 
-    private final int userId;
+    protected Integer userId;
 
-    public Meal(LocalDateTime dateTime, String description, int calories,int userId) {
-        this(null, dateTime, description, calories, userId);
+    public Meal(LocalDateTime dateTime, String description, int calories) {
+        this(null, dateTime, description, calories);
     }
 
-    public Meal(Integer id, LocalDateTime dateTime, String description, int calories, int userId) {
-        super();
+    public Meal(Integer id, LocalDateTime dateTime, String description, int calories) {
+        super(id);
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
-        this.userId = userId;
     }
 
     public LocalDateTime getDateTime() {
@@ -54,7 +54,21 @@ public class Meal extends AbstractBaseEntity {
         return userId;
     }
 
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setCalories(int calories) {
+        this.calories = calories;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
     @Override
     public String toString() {

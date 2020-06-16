@@ -17,10 +17,32 @@
     </style>
 </head>
 <body>
+
 <section>
     <h3><a href="index.html">Home</a></h3>
     <hr/>
     <h2>Meals</h2>
+    <%-- table fo sort by date--%>
+    <table border="1" cellpadding="8" cellspacing="0">
+        <thead>
+            <tr>
+                <th>От даты (включая)</th>
+                <th>До даты (включая)</th>
+                <th>От времени (включая)</th>
+                <th>От времени (включая)</th>
+            </tr>
+        </thead>
+
+        <form method="post" action="${pageContext.request.contextPath}/meals">
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </form>
+    </table>
+<p></p>
     <a href="meals?action=create">Add Meal</a>
     <br><br>
     <table border="1" cellpadding="8" cellspacing="0">

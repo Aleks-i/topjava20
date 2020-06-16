@@ -8,9 +8,9 @@ import java.util.Map;
 
 public interface MealRepository {
     // null if not found, when updated
-    Meal saveMeal(Meal meal, int userId);
+    Meal createMeal(Meal meal, int userId);
 
-    Meal updateMeal(Meal meal, int userId);
+    Meal updateMeal(Meal meal, int idMeal, int userId);
 
     // false if not found
     boolean delete(int id, int userId);

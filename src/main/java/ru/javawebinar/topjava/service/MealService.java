@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.ValidationUtil;
-import java.util.Collection;
+import java.util.List;
 
 @Service
 public class MealService {
@@ -16,11 +16,11 @@ public class MealService {
     }
 
     public Meal createMeal(Meal meal, int authUserId) {
-        return repository.saveMeal(meal, authUserId);
+        return repository.createMeal(meal, authUserId);
     }
 
-    public Meal update(Meal meal, int authUserId) {
-        return ValidationUtil.checkNotFoundWithId(repository.updateMeal(meal, authUserId), authUserId);
+    public Meal update(Meal meal, int idMeal, int authUserId) {
+        return ValidationUtil.checkNotFoundWithId(repository.updateMeal(meal, idMeal, authUserId), authUserId);
     }
 
     public void delete(int id, int authUserId) {
@@ -31,7 +31,7 @@ public class MealService {
         return ValidationUtil.checkNotFoundWithId(repository.get(id, authUserId), authUserId);
     }
 
-    public Collection<Meal> getAll(int userId) {
+    public List<Meal> getAll(int userId) {
         return repository.getAll(userId);
     }
 
