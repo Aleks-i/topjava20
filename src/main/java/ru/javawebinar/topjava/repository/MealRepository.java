@@ -1,16 +1,13 @@
 package ru.javawebinar.topjava.repository;
 
 import ru.javawebinar.topjava.model.Meal;
-
-import java.util.Collection;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
 
 public interface MealRepository {
     // null if not found, when updated
-    Meal createMeal(Meal meal, int userId);
-
-    Meal updateMeal(Meal meal, int idMeal, int userId);
+    Meal save(Meal meal, int userId);
 
     // false if not found
     boolean delete(int id, int userId);
@@ -20,8 +17,5 @@ public interface MealRepository {
 
     List<Meal> getAll(int userId);
 
-    List<Meal> filterByUserId(Map<Integer, Meal> repository, Integer userId);
-
-    List<Meal> sortMealOfDate(List<Meal> repository);
-
+    List<Meal> getFilter(LocalDate dateStart, LocalDate dateEnd, LocalTime timeStart, LocalTime timeEnd, int userId);
 }

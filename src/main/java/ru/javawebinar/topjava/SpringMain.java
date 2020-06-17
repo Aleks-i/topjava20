@@ -21,7 +21,7 @@ public class SpringMain {
             MealRestController mealRestController = appCtx.getBean(MealRestController.class);
             mealRestController.delete(5);
             mealRestController.get(1);
-            mealRestController.create(new Meal(null, LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "ac", 1000));
+            mealRestController.createMeal(new Meal(null, LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "ac", 1000));
         }
     }
 }

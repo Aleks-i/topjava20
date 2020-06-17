@@ -23,15 +23,15 @@ public class MealRestController {
     @Autowired
     private MealService service;
 
-    public void create(Meal meal) {
+    public void createMeal(Meal meal) {
         log.info("create {}", meal);
         ValidationUtil.checkNew(meal);
         service.createMeal(meal, SecurityUtil.authUserId());
     }
 
-    public void update(Meal meal, int idMeal) {
+    public void update(Meal meal) {
         log.info("upate {}", meal);
-        service.update(meal, idMeal, SecurityUtil.authUserId());
+        service.update(meal, SecurityUtil.authUserId());
     }
 
     public void delete(int id) {
@@ -55,8 +55,6 @@ public class MealRestController {
 
     public List<MealTo> getAllMealToByFilterTimeDate(LocalDate dateStart, LocalDate dateEnd,
                                                     LocalTime timeStart, LocalTime timeEnd) {
-        return MealsUtil.getAllMealToByFilterTimeDate(MealsUtil.getTos(service.getAll(SecurityUtil.authUserId()),
-                MealsUtil.DEFAULT_CALORIES_PER_DAY),
-                dateStart, dateEnd, timeStart, timeEnd);
+        return service.getAllMealToByFilterTimeDate(dateStart, dateEnd, timeStart,timeEnd, SecurityUtil.authUserId());
     }
 }

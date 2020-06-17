@@ -18,8 +18,8 @@ public class UserService {
         this.repository = repository;
     }
 
-    public User create(int userId, User user) {
-        return repository.save(userId, user);
+    public User create(User user) {
+        return repository.save(user);
     }
 
     public void delete(int id) {
@@ -39,6 +39,6 @@ public class UserService {
     }
 
     public void update(User user, int userId) {
-        checkNotFoundWithId(repository.update(user, userId), user.getId());
+        checkNotFoundWithId(repository.save(user), userId);
     }
 }

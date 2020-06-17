@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface UserRepository {
     // null if not found, when updated
-    User save(int userId, User user);
+    User save(User user);
 
     // false if not found
     boolean delete(int id);
@@ -19,5 +19,4 @@ public interface UserRepository {
 
     List<User> getAll();
 
-    User update(User user, int userId);
 }
