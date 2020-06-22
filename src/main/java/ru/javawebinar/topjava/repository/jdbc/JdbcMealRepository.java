@@ -37,7 +37,7 @@ public class JdbcMealRepository implements MealRepository {
     public Meal save(Meal meal, int userId) {
         MapSqlParameterSource map = new MapSqlParameterSource()
                 .addValue("id", meal.getId())
-                .addValue("date-time", meal.getDateTime())
+                .addValue("datetime", meal.getDateTime())
                 .addValue("description", meal.getDescription())
                 .addValue("calories", meal.getCalories());
 
@@ -49,8 +49,8 @@ public class JdbcMealRepository implements MealRepository {
         else if (jdbcTemplate.queryForObject("SELECT user_id FROM user_meal WHERE id=?", Integer.class, meal.getId())
                 != null && Integer.valueOf(userId).equals(jdbcTemplate.queryForObject("SELECT user_id FROM user_meal " +
                         "WHERE id=?", Integer.class, meal.getId()))) {
-            namedParameterJdbcTemplate.update("UPDATE user_meal SET date-time=:date-time, decription=:description," +
-                    "calories=:calories, WHERE id=:id", map);
+            namedParameterJdbcTemplate.update("UPDATE user_meal SET date_time=:datetime, description=:description, " +
+                    "calories=:calories WHERE id=:id", map);
             return meal;
         }
         return null;
@@ -61,7 +61,7 @@ public class JdbcMealRepository implements MealRepository {
         if (jdbcTemplate.queryForObject("SELECT user_id FROM user_meal WHERE id=?", Integer.class, id) !=null &&
                 Integer.valueOf(userId).equals(jdbcTemplate.queryForObject("SELECT user_id FROM user_meal WHERE id=?",
                         Integer.class, id))) {
-            return jdbcTemplate.update("DELETE FROM meal_user WHERE id=?", id) != 0;
+            return jdbcTemplate.update("DELETE FROM user_meal WHERE id=?", id) != 0;
         }
         return false;
     }
@@ -79,14 +79,18 @@ public class JdbcMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getAll(int userId) {
-        List<Meal> mealList = jdbcTemplate.query("SELECT * FROM user_meal WHERE id=?", ROW_MAPPER, userId);
+        List<Meal> mealList = jdbcTemplate.query("SELECT * FROM user_meal WHERE user_id=?", ROW_MAPPER, userId);
         return mealList.stream()
-                .sorted(Comparator.comparing(Meal::getDateTime))
+                .sorted(Comparator.comparing(Meal::getDateTime).reversed())
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Meal> getBetweenHalfOpen(LocalDateTime startDate, LocalDateTime endDate, int userId) {
-        return null;
+        List<Meal> mealFilter = getAll(userId);
+        return mealFilter.stream()
+                .filter(meal -> meal.getDateTime().isAfter(startDate) && meal.getDateTime().isBefore(endDate))
+                .sorted(Comparator.comparing(Meal::getDateTime).reversed())
+                .collect(Collectors.toList());
     }
 }
