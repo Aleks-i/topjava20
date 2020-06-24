@@ -1,9 +1,12 @@
-
+.gitignore
 .idea
 out
 target
 *.iml
 log
 *.patch
+mistakes
+patch
+/src/main/resources/db/postgres.properties
 
 

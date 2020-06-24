@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
+import ru.javawebinar.topjava.repository.inmemory.InMemoryMealRepository;
 import java.time.LocalDate;
 import java.util.List;
 import static ru.javawebinar.topjava.util.DateTimeUtil.atStartOfDayOrMin;
@@ -14,14 +15,14 @@ import static ru.javawebinar.topjava.util.DateTimeUtil.atStartOfNextDayOrMax;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 
 @Service
-@Component("mealService")
-public class MealService {
+@Component("mealServiceTestInMemory")
+public class MealServiceTestInMemory {
 
-    @Qualifier("jdbcMealRepository")
+    @Qualifier("inMemoryMealRepository")
     @Autowired
-    private final MealRepository repository;
+    private final InMemoryMealRepository repository;
 
-    public MealService(@Qualifier("jdbcMealRepository") MealRepository repository) {
+    public MealServiceTestInMemory(@Qualifier("inMemoryMealRepository") InMemoryMealRepository repository) {
         this.repository = repository;
     }
 
