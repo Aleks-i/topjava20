@@ -8,13 +8,11 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Repository
 @Component("jdbcMealRepository")
 public class JdbcMealRepository implements MealRepository {
 
@@ -74,6 +72,8 @@ public class JdbcMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getBetweenHalfOpen(LocalDateTime startDate, LocalDateTime endDate, int userId) {
-        return Collections.emptyList();
+        return jdbcTemplate.query("SELECT * FROM meals WHERE user_id=? AND date_time >= ? " +
+                "AND date_time < ? ORDER BY date_time DESC", ROW_MAPPER, userId, startDate, endDate);
     }
 }
+
