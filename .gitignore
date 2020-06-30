@@ -1,9 +1,10 @@
-
+.gitignore
 .idea
 out
 target
 *.iml
 log
 *.patch
+src\main\resources\db\**.properties
 
 

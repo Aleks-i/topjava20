@@ -1,11 +1,9 @@
 package ru.javawebinar.topjava;
 
 import ru.javawebinar.topjava.model.Meal;
-
 import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
-
 import static java.time.LocalDateTime.of;
 import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
