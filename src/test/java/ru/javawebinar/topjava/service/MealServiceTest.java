@@ -15,11 +15,9 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
-
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.concurrent.TimeUnit;
-
 import static org.junit.Assert.assertThrows;
 import static org.slf4j.LoggerFactory.getLogger;
 import static ru.javawebinar.topjava.MealTestData.*;
