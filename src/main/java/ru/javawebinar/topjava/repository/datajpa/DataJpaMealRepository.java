@@ -1,17 +1,11 @@
 package ru.javawebinar.topjava.repository.datajpa;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,28 +13,31 @@ import java.util.stream.Collectors;
 @Repository
 @Transactional(readOnly = true)
 public class DataJpaMealRepository implements MealRepository {
-//    private static final Sort SORT_BY_DATE = Sort.by(Sort.Direction.DESC, "date_time");
 
-    private final CrudMealRepository crudRepository;
+    private final CrudMealRepository crudMealRepository;
 
-    @PersistenceContext
-    EntityManager em;
+    private final CrudUserRepository crudUserRepository;
 
-    public DataJpaMealRepository(CrudMealRepository crudRepository) {
-        this.crudRepository = crudRepository;
+    public DataJpaMealRepository(CrudMealRepository crudMealRepository, CrudUserRepository crudUserRepository) {
+        this.crudMealRepository = crudMealRepository;
+        this.crudUserRepository = crudUserRepository;
     }
 
     @Override
     @Transactional
     public Meal save(Meal meal, int userId) {
-        User userProxy = em.getReference(User.class, userId);
         if (meal.isNew()) {
-            meal.setUser(userProxy);
-            return crudRepository.save(meal);
+            meal.setUser(crudUserRepository.getOne(userId));
+            return crudMealRepository.save(meal);
         }
-        else if (em.getReference(Meal.class, meal.getId()).getUser().getId() == userId) {
-            meal.setUser(userProxy);
-            return crudRepository.save(meal);
+        else if (crudMealRepository.getOne(meal.getId()).getUser().getId() == userId) {
+            try {
+                meal.setUser(crudUserRepository.getOne(userId));
+                return crudMealRepository.save(meal);
+            }
+            catch (EntityNotFoundException e) {
+                return null;
+            }
         }
         return null;
     }
@@ -48,18 +45,12 @@ public class DataJpaMealRepository implements MealRepository {
     @Override
     @Transactional
     public boolean delete(int id, int userId) {
-        if (get(id, userId) == null) {
-            return false;
-        }
-        else {
-            crudRepository.delete(get(id, userId));
-            return true;
-        }
+        return crudMealRepository.delete(id, userId) != 0;
     }
 
     @Override
     public Meal get(int id, int userId) {
-        Meal meal = crudRepository.findById(id).orElse(null);
+        Meal meal = crudMealRepository.findById(id).orElse(null);
         if (meal == null || meal.getUser().getId() != userId) {
             return null;
         }
@@ -68,19 +59,12 @@ public class DataJpaMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getAll(int userId) {
-        List<Meal> meals = crudRepository.findAll();
-        return meals.stream()
-                .filter(meal -> meal.getUser().getId() == userId)
-                .sorted(Comparator.comparing(Meal::getDateTime).reversed())
-                .collect(Collectors.toList());
+        return crudMealRepository.findAll(userId);
+
     }
 
     @Override
     public List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
-        List<Meal> meals = getAll(userId);
-        return meals.stream()
-                .filter(meal -> meal.getDateTime().isAfter( startDateTime) && meal.getDateTime().isBefore(endDateTime))
-                .sorted(Comparator.comparing(Meal::getDateTime).reversed())
-                .collect(Collectors.toList());
+        return crudMealRepository.getBetweenHalfOpen(startDateTime, endDateTime, userId);
     }
 }
